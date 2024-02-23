@@ -47,7 +47,7 @@ public class BotService
 
             if (!IsRequestAllowed(userId.Value))
             {
-                await _botClient.SendTextMessageAsync(userId.Value, "Вы превысили лимит запросов. Попробуйте позже." + "\n \n" + "You have exceeded your request limit. Try later.");
+                await _botClient.SendTextMessageAsync(userId.Value, "You have exceeded your request limit. Try later.");
                 return;
             }
             switch (update.Type)
@@ -55,8 +55,6 @@ public class BotService
                 case UpdateType.Message:
                     Message message = update.Message;
                     HandleMessage(_botClient, message);
-                    /*
-                    }*/
                     break;
                 case UpdateType.CallbackQuery:
                     {
@@ -92,28 +90,28 @@ public class BotService
                                 case "/delete_character":
                                     if (await Database.CheckUserHaveIdAsync(id, userServers[chatId]) && await Database.DeleteCharacter(id, userServers[chatId]))
                                     {
-                                        await _botClient.SendTextMessageAsync(chatId, "Персонаж отвязан от Telegram." + "\n \n" + "The character is unlinked from Telegram.");
+                                        await _botClient.SendTextMessageAsync(chatId, "The character is unlinked from Telegram.");
                                     }
                                     else
                                     {
-                                        await _botClient.SendTextMessageAsync(chatId, "Такой пользователь не найден." + "\n \n" + "This user was not found.");
+                                        await _botClient.SendTextMessageAsync(chatId, "This user was not found.");
                                     }
                                     break;
                                 case "/add_character":
                                     if (await Database.CheckUserAlreadyVerified(message.Chat.Id, userServers[chatId]))
                                     {
-                                        await _botClient.SendTextMessageAsync(chatId, "Превышен лимит персонажей." + "\n \n" + "Character limit exceeded.");
+                                        await _botClient.SendTextMessageAsync(chatId, "Character limit exceeded.");
                                     }
                                     else if (await Database.CheckUserHaveIdAsync(id, userServers[chatId]))
                                     {
                                         if (await Database.RegisterUserAsync(chatId, username, messageText, userServers[chatId]))
-                                            await _botClient.SendTextMessageAsync(chatId, "Персонаж привязан к Telegram. Сервер: " + userServers[chatId] + "\n" + "\n" + "Your character was connected with Telegram. Server: " + userServers[chatId]);
+                                            await _botClient.SendTextMessageAsync(chatId, "Your character was connected with Telegram. Server: " + userServers[chatId]);
                                         else
-                                            await _botClient.SendTextMessageAsync(chatId, "Пользователь уже верифицирован." + "\n \n" + "The user has already been verified.");
+                                            await _botClient.SendTextMessageAsync(chatId,"The user has already been verified.");
                                     }
                                     else
                                     {
-                                        await _botClient.SendTextMessageAsync(chatId, "Такой пользователь не найден." + "\n \n" + "This user was not found.");
+                                        await _botClient.SendTextMessageAsync(chatId, "This user was not found.");
                                     }
                                     break;
                             }
@@ -135,13 +133,12 @@ public class BotService
                                                 userStates[chatId] = messageText;
                                             }
                                         }
-                                        await _botClient.SendTextMessageAsync(chatId, "Отправьте мне свой идентификатор. Получить его можно в игре с помощью команды <code>.telegram</code>"
-                                            + "\n \n" + "<b>Внимание! Не сообщайте этот код никому.</b>"
-                                            + "\n \n" + "Send me your ID. You can get it in the game using the <code>.telegram</code> command"
+                                        await _botClient.SendTextMessageAsync(chatId, 
+                                           "Send me your ID. You can get it in the game using the <code>.telegram</code> command"
                                             + "\n \n" + "<b>Attention! Do not share this code with anyone.</b>", parseMode: ParseMode.Html);
                                     }
                                     else
-                                        await _botClient.SendTextMessageAsync(chatId, "Сначала выберите сервер." + "\n \n" + "First select a server.");
+                                        await _botClient.SendTextMessageAsync(chatId, "First select a server.");
                                     break;
                                 case "/delete_character":
                                     if (userServers.ContainsKey(chatId))
@@ -157,8 +154,7 @@ public class BotService
                                                 userStates[chatId] = messageText;
                                             }
                                         }
-                                        await _botClient.SendTextMessageAsync(chatId, "Отправьте мне свой идентификатор. Получить его можно в игре с помощью команды .telegram"
-                                            + " \n \n" + "Send me your ID. You can get it in the game using the .telegram command");
+                                        await _botClient.SendTextMessageAsync(chatId, "Send me your ID. You can get it in the game using the .telegram command");
                                     }
                                     else
                                         await _botClient.SendTextMessageAsync(chatId, "Сначала выберите сервер." + "\n \n " + "First select a server.");
@@ -169,7 +165,7 @@ public class BotService
 
                                     var inlineKeyboard = new InlineKeyboardMarkup(buttons);
 
-                                    await _botClient.SendTextMessageAsync(chatId, "Выберите сервер" + "\n" + "\n" + "Choose server", replyMarkup: inlineKeyboard);
+                                    await _botClient.SendTextMessageAsync(chatId, "Choose server", replyMarkup: inlineKeyboard);
                                     break;
                                 case "/start":
                                     inlineKeyboard = new InlineKeyboardMarkup(new[]
@@ -179,9 +175,7 @@ public class BotService
                                                             InlineKeyboardButton.WithCallbackData("Add character (max 3)", "/add_character"),
                                                         },
                                                      });
-                                    await _botClient.SendTextMessageAsync(chatId, "Привет. Я - Бот комплекса игровых серверов L2 High Five проекта Destarion." +
-                                             " С помощью меня ты можешь получать уведомления о смерти своего персонажа во время автоматического фарма," +
-                                             " а также получать промокоды со специальными подарками!" + "\n \n" +
+                                    await _botClient.SendTextMessageAsync(chatId,
                                              "Hello. I am a Bot of the L2 High Five game server complex of the Destarion project."
                                               + " With my help, you can receive notifications about the death of your character during automatic farming, "
                                               + "and also receive promotional codes with special gifts!", replyMarkup: inlineKeyboard);
@@ -200,14 +194,13 @@ public class BotService
                                 case "/current_server":
                                     if (!userServers.ContainsKey(chatId))
                                     {
-                                        await _botClient.SendTextMessageAsync(chatId, "Сервер не выбран." + "\n \n" + "Server not selected.");
+                                        await _botClient.SendTextMessageAsync(chatId, "Server not selected.");
                                     }
                                     else
-                                        await _botClient.SendTextMessageAsync(chatId, "Сервер:" + userServers[chatId] + "\n \n" + "Server: " + userServers[chatId]);
+                                        await _botClient.SendTextMessageAsync(chatId, "Server: " + userServers[chatId]);
                                     break;
                                 default:
-                                    await _botClient.SendTextMessageAsync(chatId, "Я не понимаю этой команды, или вы отправили ник персонажа. Для управления используйте <b>Меню</b>"
-                                        + "\n \n" + "I don't understand this command, or did you send the character's nickname. To control, use <b>Menu</b>", parseMode: ParseMode.Html);
+                                    await _botClient.SendTextMessageAsync(chatId, "I don't understand this command, or did you send the character's nickname. To control, use <b>Menu</b>", parseMode: ParseMode.Html);
                                     break;
                             }
 
@@ -247,7 +240,7 @@ public class BotService
 
                         var inlineKeyboard = new InlineKeyboardMarkup(buttons);
 
-                        await _botClient.SendTextMessageAsync(chatId, "Выберите сервер" + "\n \n" + "Select a server.", replyMarkup: inlineKeyboard);
+                        await _botClient.SendTextMessageAsync(chatId, "Select a server.", replyMarkup: inlineKeyboard);
                     }
 
                     break;
@@ -266,24 +259,20 @@ public class BotService
                 {
                     if (userInfo.requestCount >= requestLimit)
                     {
-                        // Превышен лимит запросов
                         return false;
                     }
                     else
                     {
-                        // Увеличиваем счетчик запросов и обновляем время последнего запроса
                         Requests[userId] = (currentUnixTimestamp, userInfo.requestCount + 1);
                     }
                 }
                 else
                 {
-                    // Сброс счетчика после истечения интервала и обновление времени последнего запроса
                     Requests[userId] = (currentUnixTimestamp, 1);
                 }
             }
             else
             {
-                // Новый пользователь: добавляем его с текущим временем и счетчиком запросов, равным 1
                 Requests.Add(userId, (currentUnixTimestamp, 1));
             }
         }
@@ -303,8 +292,8 @@ public class BotService
                 userServers[chatId] = selectedServer;
             }
         }
-        await botClient.SendTextMessageAsync(chatId, $"Вы выбрали сервер: {selectedServer}." + "\n \n" + $"You have selected a server: {selectedServer}.");
-        await botClient.SendTextMessageAsync(chatId, "<b>Чтобы добавить или удалить персонажа, нажмите Меню.</b>" + "\n \n" + "<b>To add or remove a character, click Menu.</b>", parseMode: ParseMode.Html);
+        await botClient.SendTextMessageAsync(chatId, $"You have selected a server: {selectedServer}.");
+        await botClient.SendTextMessageAsync(chatId, "<b>To add or remove a character, click Menu.</b>", parseMode: ParseMode.Html);
     }
     public static long GetCurrentUnixTimestampSeconds()
     {
