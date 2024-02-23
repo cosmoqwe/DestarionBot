@@ -157,7 +157,7 @@ public class BotService
                                         await _botClient.SendTextMessageAsync(chatId, "Send me your ID. You can get it in the game using the .telegram command");
                                     }
                                     else
-                                        await _botClient.SendTextMessageAsync(chatId, "Сначала выберите сервер." + "\n \n " + "First select a server.");
+                                        await _botClient.SendTextMessageAsync(chatId, "First select a server.");
                                     break;
                                 case "/choose_server":
                                     var buttons = servers.Select(server =>
