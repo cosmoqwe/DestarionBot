@@ -33,7 +33,7 @@ namespace DestarionBot
                 ThrowPendingUpdates = true, //обработка полученных сообщений пока бот был отключен, true - выключено, false - включено
             };
             _botClient.StartReceiving(BotService.HandleUpdateAsync, BotService.ErrorHandler, _receiverOptions, cts.Token);
-            Logger.LogAsync("Bot is up and running " + _botClient.GetMeAsync().Result.FirstName + " version 1.0.3", Logger.LogLevel.Info);
+            Logger.LogAsync("Bot is up and running " + _botClient.GetMeAsync().Result.FirstName, Logger.LogLevel.Info);
             while(true)
             {
                 
