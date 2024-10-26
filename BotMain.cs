@@ -1,56 +1,32 @@
 ﻿using Telegram.Bot;
-using Telegram.Bot.Polling;
-using Telegram.Bot.Types.Enums;
-using Microsoft.Extensions.Configuration;
-using System.Reflection;
-using System.Configuration;
-
+using static DestarionBot.BotClient;
 namespace DestarionBot
 {
     internal class BotMain
-    {
-
-        private static ITelegramBotClient _botClient;
-        private static ReceiverOptions _receiverOptions;
-        
+    {   
         static async Task Main(string[] args)
         {
-            var builder = new ConfigurationBuilder().SetBasePath(AppContext.BaseDirectory).AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-            IConfigurationRoot configuration = builder.Build();
-            string token = configuration.GetSection("BotConfiguration")["BotToken"];
-            
-            _botClient = new TelegramBotClient(token);
-            using var cts = new CancellationTokenSource();
-
-
-            _receiverOptions = new ReceiverOptions 
+            AppDomain.CurrentDomain.ProcessExit += async (sender, eventArgs) =>
             {
-                AllowedUpdates = new[]
-                {
-                    UpdateType.Message,
-                    UpdateType.CallbackQuery,
-                },
-                ThrowPendingUpdates = true, //обработка полученных сообщений пока бот был отключен, true - выключено, false - включено
+                await OnApplicationExit();
             };
-            _botClient.StartReceiving(BotService.HandleUpdateAsync, BotService.ErrorHandler, _receiverOptions, cts.Token);
-            Logger.LogAsync("Bot is up and running " + _botClient.GetMeAsync().Result.FirstName, Logger.LogLevel.Info);
-            while(true)
+            Language.LoadMessages();
+            Logger.LogAsync("Bot is up and running " + Bot.GetMeAsync().Result.FirstName, Logger.LogLevel.Info); 
+            while (true)
             {
-                
                 foreach(var key in Database._connectionStrings) 
                 {
                     await Database.DeleteFromQueueAndSend(key.Value);
                 }
-                
                 await Task.Delay(5000);
             }
-
         }
-        public static async Task SendMessageToUsersAsync(long chat_id, string message, int delay)
+        static async Task OnApplicationExit()
         {
-           await _botClient.SendTextMessageAsync(chat_id, message);
-           await Task.Delay(delay);
+            foreach(var user in BotService.activeUsers.Values)
+            {
+                await user.SaveData();
+            }
         }
-
     }
 }
