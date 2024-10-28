@@ -80,14 +80,27 @@ namespace DestarionBot
                     break;
             }
         }
-        public static async Task<string> Build(User user, Language.MessageType type, string[] args = null)
+        public static async Task<string> Build(User user, Language.MessageType type, string[]? args = null)
         {
-            var response = await Language.Get(user.Language, type);
+            var response = await Language.Get(user.Language ?? "English", type);
             if(args is not null && args.Length > 0)
             {
                  response = await ReplaceHolders(response, args);
             }
             return response;
+        }
+        public static async Task<string?> BuildServerMessage(long chatId, string[]? args = null)
+        {
+            if (Enum.TryParse(args[0], true, out Language.MessageType type))
+            {
+                string message = await Build(await BotService.GetUser(chatId), type, args.Length > 1 ? args.Skip(1).ToArray() : null);
+                if (!String.IsNullOrEmpty(message))
+                {
+                    return message;
+                }
+                else throw new KeyNotFoundException("Not found message from server. Type: " + args[0]);
+            }
+            else throw new KeyNotFoundException("Not found message from server. Type: " + args[0]);
         }
         private static async Task<string> ReplaceHolders(string text, string[] args)
         {
@@ -122,7 +135,6 @@ namespace DestarionBot
                 default:
                     keyboard = null;
                     throw new NotImplementedException("Not implemented case in MessageHandler.BuildKeyboard!");
-                    break;
             }
             return keyboard;
         }

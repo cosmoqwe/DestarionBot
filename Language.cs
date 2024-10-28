@@ -8,6 +8,8 @@ namespace DestarionBot
     {
         public enum MessageType
         {
+            #region Bot Messages
+
             Start, 
             OutOfLimit,
             LanguageSelected,
@@ -22,14 +24,21 @@ namespace DestarionBot
             UnknownCommand,
             AlreadyVerified,
             CurrentServerInfo,
-            Help
+            Help,
+
+            #endregion
+            #region Server Messages
+
+            CharacterDied,
+            CharacterWasKilled,
+            CharacterSold,
+            CharacterSoldStackable,
+            CharacterSoldPackage,
+            CharacterBought,
+            CharacterBoughtStackable,
+            #endregion
         }
-        public static async Task<string> Get(string language, MessageType type)
-        {
-            if(Messages.TryGetValue(language, out var messageDictionary) &&  messageDictionary.TryGetValue(type, out string message))
-                return message;
-            throw new KeyNotFoundException($"Message for language '{language}' and type '{type}' not found. Stack trace: {Environment.StackTrace}");
-        }
+        
         private static Dictionary<string, Dictionary<MessageType, string>> messages = new Dictionary<string, Dictionary<MessageType, string>>();
         
         public static Dictionary<string, Dictionary<MessageType, string>> Messages
@@ -47,9 +56,16 @@ namespace DestarionBot
         {
             get => messages.Keys.ToArray();
         }
+        public static async Task<string> Get(string language, MessageType type)
+        {
+            if (Messages.TryGetValue(language, out var messageDictionary) && messageDictionary.TryGetValue(type, out string message))
+                return message;
+            throw new KeyNotFoundException($"Message for language '{language}' and type '{type}' not found. Stack trace: {Environment.StackTrace}");
+        }
         public static void LoadMessages()
         {
             var json = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Localization", "localization.json"));
+            Console.WriteLine(AppContext.BaseDirectory);
             var tempMessages = JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, string>>>(json);
             foreach (var entry in tempMessages)
             {

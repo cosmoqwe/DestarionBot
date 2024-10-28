@@ -5,11 +5,6 @@ namespace DestarionBot
 {
     internal static class CallbackQueryHandler
     {
-        private static readonly int intervalSeconds;
-        static CallbackQueryHandler()
-        {
-            intervalSeconds = Config.GetValue<int>("BotConfiguration:IntervalSeconds");
-        }
         public static async Task Handle(CallbackQuery query, User user)
         {
             if(Language.Languages.Contains(query.Data))

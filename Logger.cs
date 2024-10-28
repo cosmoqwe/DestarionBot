@@ -4,17 +4,17 @@ namespace DestarionBot
     public class Logger
     {
         private static readonly string logFilePath;
-        static Logger()
-        {
-            var builder = new ConfigurationBuilder().SetBasePath(AppContext.BaseDirectory).AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-            IConfigurationRoot configuration = builder.Build();
-            logFilePath = configuration.GetValue<string>("BotConfiguration:LogFilePath");
-        }
         public enum LogLevel
         {
             Info,
             Warning,
             Error
+        }
+        static Logger()
+        {
+            var builder = new ConfigurationBuilder().SetBasePath(AppContext.BaseDirectory).AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+            IConfigurationRoot configuration = builder.Build();
+            logFilePath = configuration.GetValue<string>("BotConfiguration:LogFilePath");
         }
 
         public static async Task LogAsync(string message, LogLevel level = LogLevel.Info)

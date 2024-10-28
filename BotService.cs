@@ -14,6 +14,7 @@ namespace DestarionBot
         public static readonly List<string> servers;
         private static readonly int requestLimit;
         private static readonly int intervalSeconds;
+       
         public static int RequestLimit
         {
             get => requestLimit;
@@ -21,6 +22,19 @@ namespace DestarionBot
         public static int IntervalSeconds
         {
             get => intervalSeconds;
+        }
+        public static async Task<User> GetUser(long chatId, string? username = null)
+        {
+            if (!activeUsers.TryGetValue(chatId, out User user))
+            {
+                user = await User.TryGetUser(chatId);
+                if (user is not null)
+                {
+                    activeUsers.TryAdd(chatId, user);
+                    user.Username = username is null ? user.Username : username;
+                }
+            }
+            return user;
         }
         static BotService()
         {
@@ -45,16 +59,9 @@ namespace DestarionBot
             try
             {
                 var userId = update.Message?.Chat?.Id ?? update.CallbackQuery?.From?.Id;
+                var username = update.Message?.Chat?.Username ?? update.CallbackQuery?.From?.Username;
                 if (!userId.HasValue) return;
-                if (!activeUsers.TryGetValue(userId.Value, out User user))
-                {
-                    user = await User.TryGetUser(userId.Value);
-                    if (user is not null)
-                    {
-                        activeUsers.TryAdd(userId.Value, user);
-                        user.Username = update.Message?.Chat?.Username ?? update.CallbackQuery?.From?.Username;
-                    }
-                }
+                var user = await GetUser(userId.Value, username);
                 if (!user.IsRequestAllowed)
                 {
                     await Bot.SendTextMessageAsync(userId.Value, await Language.Get(user.Language ?? "English", Language.MessageType.OutOfLimit));

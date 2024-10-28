@@ -9,11 +9,9 @@ namespace DestarionBot
     internal class Database
     {
         public static Dictionary<string, string> _connectionStrings = new Dictionary<string, string>();
-        static int delaySendMessage;
         static Database()
         {
             IConfigurationSection connectionStringsSection = Config.GetSection("ConnectionStrings");
-            delaySendMessage = Config.GetValue<int>("BotConfiguration:IntervalSendMessageMillis");
             foreach (var connectionString in connectionStringsSection.GetChildren())
             {
                 _connectionStrings.Add(connectionString.Key, connectionString.Value);
@@ -140,22 +138,23 @@ namespace DestarionBot
                             {
                                 deleteCommand.Parameters.AddWithValue($"@id{i}", chatIds[i]);
                             }
-
                             await deleteCommand.ExecuteNonQueryAsync();
                         }
                     }
                     foreach (var message in messages)
                     {
+                        string[] builder = message.message.Split(',');
+                        string awaiter = await MessageHandler.BuildServerMessage(message.chatId, builder);
                         if (!sentMessages.Contains(message.message))
                         {
-                            await Bot.SendTextMessageAsync(message.chatId, message.message);
+                            await Bot.SendTextMessageAsync(message.chatId, awaiter);
                             sentMessages.Add(message.message);
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    await Logger.LogAsync("Error on send message: " + ex.Message + "Stack trace: " + Environment.StackTrace, Logger.LogLevel.Error);
+                    await Logger.LogAsync("Error on send message: " + ex.Message + "Stack trace: " + ex.StackTrace, Logger.LogLevel.Error);
                 }
             }
         }
