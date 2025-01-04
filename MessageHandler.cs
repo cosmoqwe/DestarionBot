@@ -40,52 +40,52 @@ namespace DestarionBot
                 }
                 else
                 {
-                    await Bot.SendTextMessageAsync(user.ChatId, await Build(user, Language.MessageType.ServerSelectionPrompt), await BuildKeyboard(user, CommandType.ChooseServer));
+                    await Bot.SendTextMessageAsync(user.ChatId, Build(user, Language.MessageType.ServerSelectionPrompt), BuildKeyboard(user, CommandType.ChooseServer));
                     return;
                 }
             }
             switch(commandType)
             {
                 case CommandType.Start:
-                    await Bot.SendTextMessageAsync(user.ChatId, await Build(user, Language.MessageType.Start), await BuildKeyboard(user, CommandType.ChooseServer));
+                    await Bot.SendTextMessageAsync(user.ChatId,Build(user, Language.MessageType.Start), BuildKeyboard(user, CommandType.ChooseServer));
                     break;
                 case CommandType.AddCharacter:
                     user.State = message;
                     if (!String.IsNullOrEmpty(user.Server))
-                        await Bot.SendTextMessageAsync(user.ChatId, await Build(user, Language.MessageType.SendIdPrompt));
+                        await Bot.SendTextMessageAsync(user.ChatId, Build(user, Language.MessageType.SendIdPrompt));
                     else 
-                        await Bot.SendTextMessageAsync(user.ChatId, await Build(user, Language.MessageType.ServerSelectionPrompt), await BuildKeyboard(user, CommandType.ChooseServer));
+                        await Bot.SendTextMessageAsync(user.ChatId, Build(user, Language.MessageType.ServerSelectionPrompt), BuildKeyboard(user, CommandType.ChooseServer));
                     break;
                 case CommandType.DeleteCharacter:
                     user.State = message;
                     if (!String.IsNullOrEmpty(user.Server))
-                        await Bot.SendTextMessageAsync(user.ChatId, await Build(user, Language.MessageType.SendIdPrompt));
+                        await Bot.SendTextMessageAsync(user.ChatId, Build(user, Language.MessageType.SendIdPrompt));
                     else
-                        await Bot.SendTextMessageAsync(user.ChatId, await Build(user, Language.MessageType.ServerSelectionPrompt), await BuildKeyboard(user, CommandType.ChooseServer));
+                        await Bot.SendTextMessageAsync(user.ChatId, Build(user, Language.MessageType.ServerSelectionPrompt), BuildKeyboard(user, CommandType.ChooseServer));
                     break;
                 case CommandType.CurrentServer:
-                    await Bot.SendTextMessageAsync(user.ChatId, await Build(user, Language.MessageType.CurrentServerInfo, new string[] { String.IsNullOrEmpty(user.Server) ? "null" : user.Server}));
+                    await Bot.SendTextMessageAsync(user.ChatId, Build(user, Language.MessageType.CurrentServerInfo, new string[] { String.IsNullOrEmpty(user.Server) ? "null" : user.Server}));
                     break;
                 case CommandType.ChooseLanguage:
-                    await Bot.SendTextMessageAsync(user.ChatId, "Choose language", await BuildKeyboard(user, CommandType.ChooseLanguage));
+                    await Bot.SendTextMessageAsync(user.ChatId, "Choose language", BuildKeyboard(user, CommandType.ChooseLanguage));
                     break;
                 case CommandType.ChooseServer:
-                    await Bot.SendTextMessageAsync(user.ChatId, await Build(user, Language.MessageType.ServerSelectionPrompt), await BuildKeyboard(user, CommandType.ChooseServer));
+                    await Bot.SendTextMessageAsync(user.ChatId, Build(user, Language.MessageType.ServerSelectionPrompt), BuildKeyboard(user, CommandType.ChooseServer));
                     break;
                 case CommandType.Help:
-                    await Bot.SendTextMessageAsync(user.ChatId, await Build(user, Language.MessageType.Help));
+                    await Bot.SendTextMessageAsync(user.ChatId, Build(user, Language.MessageType.Help));
                     break;
                 case CommandType.Unknown:
-                    await Bot.SendTextMessageAsync(user.ChatId, await Build(user, Language.MessageType.UnknownCommand));
+                    await Bot.SendTextMessageAsync(user.ChatId, Build(user, Language.MessageType.UnknownCommand));
                     break;
             }
         }
-        public static async Task<string> Build(User user, Language.MessageType type, string[]? args = null)
+        public static string Build(User user, Language.MessageType type, string[]? args = null)
         {
-            var response = await Language.Get(user.Language ?? "English", type);
+            var response = Language.Get(user.Language ?? "English", type);
             if(args is not null && args.Length > 0)
             {
-                 response = await ReplaceHolders(response, args);
+                 response = ReplaceHolders(response, args);
             }
             return response;
         }
@@ -93,7 +93,7 @@ namespace DestarionBot
         {
             if (Enum.TryParse(args[0], true, out Language.MessageType type))
             {
-                string message = await Build(await BotService.GetUser(chatId), type, args.Length > 1 ? args.Skip(1).ToArray() : null);
+                string message = Build(await BotService.GetUser(chatId), type, args.Length > 1 ? args.Skip(1).ToArray() : null);
                 if (!String.IsNullOrEmpty(message))
                 {
                     return message;
@@ -102,13 +102,13 @@ namespace DestarionBot
             }
             else throw new KeyNotFoundException("Not found message from server. Type: " + args[0]);
         }
-        private static async Task<string> ReplaceHolders(string text, string[] args)
+        private static string ReplaceHolders(string text, string[] args)
         {
             for (int i = 0; i < args.Length; i++)
                 text = text.Replace("{" + i + "}", args[i]);
             return text;
         }
-        public static async Task<InlineKeyboardMarkup> BuildKeyboard(User user, CommandType type)
+        public static InlineKeyboardMarkup BuildKeyboard(User user, CommandType type)
         {
             InlineKeyboardButton[] buttons;
             InlineKeyboardMarkup keyboard;

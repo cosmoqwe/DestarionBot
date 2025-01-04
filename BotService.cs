@@ -64,7 +64,7 @@ namespace DestarionBot
                 var user = await GetUser(userId.Value, username);
                 if (!user.IsRequestAllowed)
                 {
-                    await Bot.SendTextMessageAsync(userId.Value, await Language.Get(user.Language ?? "English", Language.MessageType.OutOfLimit));
+                    await Bot.SendTextMessageAsync(userId.Value, Language.Get(user.Language ?? "English", Language.MessageType.OutOfLimit));
                     return;
                 }
                 if(update.Type is UpdateType.CallbackQuery)

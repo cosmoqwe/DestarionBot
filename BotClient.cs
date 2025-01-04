@@ -58,7 +58,7 @@ namespace DestarionBot
             }
             catch (Exception ex)
             {
-                await Logger.LogAsync("Exception on sending message! " + ex.StackTrace, Logger.LogLevel.Error);
+                await Logger.LogAsync("Exception on sending message! Exception: " + ex.Message + " Stack Trace: " + ex.StackTrace, Logger.LogLevel.Error);
             }
             finally
             {

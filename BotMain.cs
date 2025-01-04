@@ -3,13 +3,16 @@ using static DestarionBot.BotClient;
 namespace DestarionBot
 {
     internal class BotMain
-    {   
+    {
+       
         static async Task Main(string[] args)
         {
-            AppDomain.CurrentDomain.ProcessExit += async (sender, eventArgs) =>
+           await Logger.LogAsync("start", Logger.LogLevel.Info);
+           AppDomain.CurrentDomain.ProcessExit += async (sender, eventArgs) =>
             {
                 await OnApplicationExit();
             };
+            AppDomain.CurrentDomain.UnhandledException += UnhandledExceptionTrapper;
             Language.LoadMessages();
             Logger.LogAsync("Bot is up and running " + Bot.GetMeAsync().Result.FirstName, Logger.LogLevel.Info); 
             while (true)
@@ -27,6 +30,12 @@ namespace DestarionBot
             {
                 await user.SaveData();
             }
+        }
+        private static void UnhandledExceptionTrapper(object sender, UnhandledExceptionEventArgs e)
+        {
+            var exception = e.ExceptionObject as Exception;
+            Logger.Log($"Unhandled exception: {exception?.Message}");
+            Environment.Exit(1);
         }
     }
 }

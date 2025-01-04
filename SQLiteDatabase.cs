@@ -40,7 +40,7 @@ namespace DestarionBot
             }
             catch(Exception ex)
             {
-                Logger.LogAsync("Error in static constructor SQLiteDatabase: " + ex.Message, Logger.LogLevel.Error);
+                Logger.Log("Error in static constructor SQLiteDatabase: " + ex.Message + " Stack trace: " + ex.StackTrace, Logger.LogLevel.Error);
             }
         }
         public static async Task<object> Get(string query, object[] args)
@@ -61,7 +61,7 @@ namespace DestarionBot
                 catch (Exception ex)
                 {
                     await Logger.LogAsync("Error on getting result from SQLite database!" +
-                        " Query: " + query + " connection string: " + ConnectionString + " Exception: " + ex.Message, Logger.LogLevel.Error);
+                        " Query: " + query + " connection string: " + ConnectionString + " Exception: " + ex.Message + " Stack trace: " + ex.StackTrace, Logger.LogLevel.Error);
                 }
             }
             return default(object);
@@ -88,7 +88,7 @@ namespace DestarionBot
                 catch (Exception ex)
                 {
                     await Logger.LogAsync("Error on getting result from SQLite database!" +
-                        " Query: " + query + " connection string: " + ConnectionString + " Exception: " + ex.Message, Logger.LogLevel.Error);
+                        " Query: " + query + " connection string: " + ConnectionString + " Exception: " + ex.Message + " Stack trace: " + ex.StackTrace, Logger.LogLevel.Error);
                 }
             }
             return default(T);
@@ -109,7 +109,7 @@ namespace DestarionBot
                 }
                 catch (Exception ex)
                 {
-                    await Logger.LogAsync("Error on executing command in SQLite database! Query: " + query + " Exception:" + ex.Message + " Stack trace:" + Environment.StackTrace, Logger.LogLevel.Error);
+                    await Logger.LogAsync("Error on executing command in SQLite database! Query: " + query + " Exception:" + ex.Message + " Stack trace:" + ex.StackTrace, Logger.LogLevel.Error);
                     return false;
                 }
             }

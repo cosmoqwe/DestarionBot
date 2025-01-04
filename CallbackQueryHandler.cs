@@ -15,14 +15,14 @@ namespace DestarionBot
         private static async Task HandleChooseLanguage(CallbackQuery query, User user)
         {
             user.Language = query.Data;
-            await BotClient.Bot.SendTextMessageAsync(user.ChatId, await MessageHandler.Build(user, Language.MessageType.LanguageSelected, new string[] { user.Language}));
-            await BotClient.Bot.SendTextMessageAsync(user.ChatId, await MessageHandler.Build(user, Language.MessageType.Help));
+            await BotClient.Bot.SendTextMessageAsync(user.ChatId, MessageHandler.Build(user, Language.MessageType.LanguageSelected, new string[] { user.Language}));
+            await BotClient.Bot.SendTextMessageAsync(user.ChatId, MessageHandler.Build(user, Language.MessageType.Help));
         }
         private static async Task HandleChooseServer(CallbackQuery query, User user)
         {
             user.Server = query.Data;
-            await BotClient.Bot.SendTextMessageAsync(user.ChatId, await MessageHandler.Build(user, Language.MessageType.ServerSelected, new string[] { user.Server }));
-            await BotClient.Bot.SendTextMessageAsync(user.ChatId, await MessageHandler.Build(user, Language.MessageType.Help));
+            await BotClient.Bot.SendTextMessageAsync(user.ChatId, MessageHandler.Build(user, Language.MessageType.ServerSelected, new string[] { user.Server }));
+            await BotClient.Bot.SendTextMessageAsync(user.ChatId, MessageHandler.Build(user, Language.MessageType.Help));
         }
     }
 }

@@ -56,7 +56,7 @@ namespace DestarionBot
         {
             get => messages.Keys.ToArray();
         }
-        public static async Task<string> Get(string language, MessageType type)
+        public static string Get(string language, MessageType type)
         {
             if (Messages.TryGetValue(language, out var messageDictionary) && messageDictionary.TryGetValue(type, out string message))
                 return message;
@@ -64,28 +64,38 @@ namespace DestarionBot
         }
         public static void LoadMessages()
         {
-            var json = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Localization", "localization.json"));
-            Console.WriteLine(AppContext.BaseDirectory);
-            var tempMessages = JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, string>>>(json);
-            foreach (var entry in tempMessages)
+            try
             {
-                var language = entry.Key;
-                var messages = new Dictionary<MessageType, string>();
-                foreach (var message in entry.Value)
+                string path = Path.Combine(AppContext.BaseDirectory, "Localization", "localization.json");
+                if (!File.Exists(path))
+                    throw new FileNotFoundException($"The required file was not found: {path}");
+                var json = File.ReadAllText(path);
+                var tempMessages = JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, string>>>(json);
+                foreach (var entry in tempMessages)
                 {
-                    if (Enum.TryParse(message.Key, true, out MessageType messageType))
-                        messages[messageType] = message.Value;
-                    else
-                        throw new ArgumentException($"Invalid message type {message.Key} in language {language}");
+                    var language = entry.Key;
+                    var messages = new Dictionary<MessageType, string>();
+                    foreach (var message in entry.Value)
+                    {
+                        if (Enum.TryParse(message.Key, true, out MessageType messageType))
+                            messages[messageType] = message.Value;
+                        else
+                            throw new ArgumentException($"Invalid message type {message.Key} in language {language}");
+                    }
+                    Messages[language] = messages;
                 }
-                Messages[language] = messages;
+                foreach (var entry in Messages)
+                {
+                    if (entry.Value.Count != Enum.GetValues(typeof(MessageType)).Length)
+                    {
+                        throw new InvalidOperationException($"Not all message types were defined in language {entry.Key}");
+                    }
+                }
             }
-            foreach (var entry in Messages)
+            catch(Exception ex)
             {
-                if (entry.Value.Count != Enum.GetValues(typeof(MessageType)).Length)
-                {
-                    throw new InvalidOperationException($"Not all message types were defined in language {entry.Key}");
-                }
+                Logger.Log($"Exception on loading messages! Exception: {ex.Message}", Logger.LogLevel.Error);
+                throw;
             }
         }
     }

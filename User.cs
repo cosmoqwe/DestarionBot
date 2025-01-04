@@ -40,7 +40,7 @@ namespace DestarionBot
         }
         public string Language
         {
-            get => language ?? string.Empty;
+            get => language ?? "English";
             set => language = value;
         }
         public long ChatId
@@ -91,19 +91,19 @@ namespace DestarionBot
         }
         public async Task SaveData()
         {
-            await SQLiteQueries.Execute(SQLiteQueries.QueryType.SaveUserData, new object[] { ChatId, Username, Server, State ?? "null", Language ?? "null", LastRequestTime, RequestCount });
+            await SQLiteQueries.Execute(SQLiteQueries.QueryType.SaveUserData, new object[] { ChatId, Username, Server ?? "", State ?? "", Language ?? "", LastRequestTime, RequestCount});
         }
         public async Task ProcessRegistering(int id)
         {
             if(String.IsNullOrEmpty(Server))
             {
-                await Bot.SendTextMessageAsync(ChatId, await MessageHandler.Build(this, DestarionBot.Language.MessageType.ServerNotSelected));
-                await Bot.SendTextMessageAsync(ChatId, await MessageHandler.Build(this, DestarionBot.Language.MessageType.Help));
+                await Bot.SendTextMessageAsync(ChatId, MessageHandler.Build(this, DestarionBot.Language.MessageType.ServerNotSelected));
+                await Bot.SendTextMessageAsync(ChatId, MessageHandler.Build(this, DestarionBot.Language.MessageType.Help));
                 return;
             }
             if (Convert.ToInt32(await Queries.Get(GetVerifiesCount, new object[] { ChatId }, Server)) >= 3)
             {
-                await Bot.SendTextMessageAsync(ChatId, await MessageHandler.Build(this, DestarionBot.Language.MessageType.CharacterLimitExceeded));
+                await Bot.SendTextMessageAsync(ChatId, MessageHandler.Build(this, DestarionBot.Language.MessageType.CharacterLimitExceeded));
                 return;
             }
             else if ((await Queries.Get(GetCharacterObjId, new object[] { id }, Server) is int objId)
@@ -111,27 +111,27 @@ namespace DestarionBot
             {
                 if (await Queries.Execute(RegisterUserAndLinkCharacter, new object[] { ChatId, Username, objId, }, Server))
                 {
-                    await Bot.SendTextMessageAsync(ChatId, await MessageHandler.Build(this, DestarionBot.Language.MessageType.CharacterLinked, new string[] { Server }));
-                    await Bot.SendTextMessageAsync(ChatId, await MessageHandler.Build(this, DestarionBot.Language.MessageType.Help));
+                    await Bot.SendTextMessageAsync(ChatId, MessageHandler.Build(this, DestarionBot.Language.MessageType.CharacterLinked, new string[] { Server }));
+                    await Bot.SendTextMessageAsync(ChatId, MessageHandler.Build(this, DestarionBot.Language.MessageType.Help));
                 }
                 else
                 {
-                    await Bot.SendTextMessageAsync(ChatId, await MessageHandler.Build(this, DestarionBot.Language.MessageType.AlreadyVerified));
-                    await Bot.SendTextMessageAsync(ChatId, await MessageHandler.Build(this, DestarionBot.Language.MessageType.Help));
+                    await Bot.SendTextMessageAsync(ChatId, MessageHandler.Build(this, DestarionBot.Language.MessageType.AlreadyVerified));
+                    await Bot.SendTextMessageAsync(ChatId, MessageHandler.Build(this, DestarionBot.Language.MessageType.Help));
                 }
             }
             else
             {
-                await Bot.SendTextMessageAsync(ChatId, await MessageHandler.Build(this, DestarionBot.Language.MessageType.CharacterNotFound));
-                await Bot.SendTextMessageAsync(ChatId, await MessageHandler.Build(this, DestarionBot.Language.MessageType.Help));
+                await Bot.SendTextMessageAsync(ChatId, MessageHandler.Build(this, DestarionBot.Language.MessageType.CharacterNotFound));
+                await Bot.SendTextMessageAsync(ChatId, MessageHandler.Build(this, DestarionBot.Language.MessageType.Help));
             }
         }
         public async Task ProcessDeleting(int id)
         {
             if(String.IsNullOrEmpty(Server))
             {
-                await Bot.SendTextMessageAsync(ChatId, await MessageHandler.Build(this, DestarionBot.Language.MessageType.ServerNotSelected));
-                await Bot.SendTextMessageAsync(ChatId, await MessageHandler.Build(this, DestarionBot.Language.MessageType.Help));
+                await Bot.SendTextMessageAsync(ChatId, MessageHandler.Build(this, DestarionBot.Language.MessageType.ServerNotSelected));
+                await Bot.SendTextMessageAsync(ChatId, MessageHandler.Build(this, DestarionBot.Language.MessageType.Help));
                 return;
             }
             int obj_id = Convert.ToInt32(await Queries.Get(GetCharacterObjId, new object[] { id }, Server));
@@ -141,20 +141,20 @@ namespace DestarionBot
                 {
                     if (await Queries.Execute(UnlinkCharacter, new object[] { obj_id }, Server))
                     {
-                        await Bot.SendTextMessageAsync(ChatId, await MessageHandler.Build(this, DestarionBot.Language.MessageType.CharacterUnlinked));
-                        await Bot.SendTextMessageAsync(ChatId, await MessageHandler.Build(this, DestarionBot.Language.MessageType.Help));
+                        await Bot.SendTextMessageAsync(ChatId, MessageHandler.Build(this, DestarionBot.Language.MessageType.CharacterUnlinked));
+                        await Bot.SendTextMessageAsync(ChatId, MessageHandler.Build(this, DestarionBot.Language.MessageType.Help));
                     }
                 }
                 else
                 {
-                    await Bot.SendTextMessageAsync(ChatId, await MessageHandler.Build(this, DestarionBot.Language.MessageType.CharacterNotFound));
-                    await Bot.SendTextMessageAsync(ChatId, await MessageHandler.Build(this, DestarionBot.Language.MessageType.Help));
+                    await Bot.SendTextMessageAsync(ChatId, MessageHandler.Build(this, DestarionBot.Language.MessageType.CharacterNotFound));
+                    await Bot.SendTextMessageAsync(ChatId, MessageHandler.Build(this, DestarionBot.Language.MessageType.Help));
                 }
             }
             else
             {
-                await Bot.SendTextMessageAsync(ChatId, await MessageHandler.Build(this, DestarionBot.Language.MessageType.CharacterNotFound));
-                await Bot.SendTextMessageAsync(ChatId, await MessageHandler.Build(this, DestarionBot.Language.MessageType.Help));
+                await Bot.SendTextMessageAsync(ChatId, MessageHandler.Build(this, DestarionBot.Language.MessageType.CharacterNotFound));
+                await Bot.SendTextMessageAsync(ChatId, MessageHandler.Build(this, DestarionBot.Language.MessageType.Help));
             }
         }
     }
